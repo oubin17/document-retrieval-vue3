@@ -2,6 +2,7 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 
 import HomePage from '../views/Main.vue'
 import Search from '../views/search/Search.vue'
+import Manager from '../views/manager/Manager.vue'
 
 const routes = [
   {
@@ -13,6 +14,11 @@ const routes = [
     path: "/search",
     component: Search,
     name: 'search'
+  },
+  {
+    path: "/manager",
+    component: Manager,
+    name: 'manager'
   }
 ]
 
