@@ -9,16 +9,17 @@
     <el-form ref="formRef" :model="formData">
       <el-form-item>
         <div class="input">
-          <el-input class="search" v-model="formData.inputValue" placeholder="请输入关键字查找" clearable />
-          <el-button class="submit"  @click="confirm(formRef)" >搜索</el-button>
+          <el-input class="search" v-model="formData.keyword" placeholder="请输入关键字查找" clearable />
+          <el-button class="submit" @click="confirm(formRef)">搜索</el-button>
         </div>
       </el-form-item>
     </el-form>
     <div class="footer">
       <ul class="footer-ul">
         <li>关键字：</li>
-        <li>123</li>
-        <li>123</li>
+        <li v-for="(item, index ) in commonSearchResult" :key="index">
+          {{ item }}
+        </li>
         <li>......</li>
       </ul>
     </div>
@@ -26,31 +27,53 @@
 
   <div>
 
-
   </div>
-
-
 
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { commonSearch } from '../api'
+
 const formRef = ref()
 
+//右侧常用搜索返回值
+const commonSearchResult = ref([])
+
 const formData = reactive({
-  inputValue: ""
+  keyword: ""
 })
+
+const router = useRouter()
 
 //表单提交
 const confirm = async (formEl) => {
   if (!formEl) return
   //手动触发表单校验
-  if(formData.inputValue === '') {
+  if (formData.keyword === '') {
     ElMessage.error('请输入查找关键字')
+    return;
   }
+  router.push({
+    path: '/search',
+    query: {
+      keyword: formData.keyword
+    }
+  })
 
 }
 
+const commonSearchFunction = async () => {
+  await commonSearch().then((response) => {
+    commonSearchResult.value = response.data.data
+  })
+}
+
+onMounted(() => {
+  //右侧常用搜索
+  commonSearchFunction()
+})
 
 </script>
 

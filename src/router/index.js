@@ -3,6 +3,7 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 import HomePage from '../views/Main.vue'
 import Search from '../views/search/Search.vue'
 import Manager from '../views/manager/Manager.vue'
+import Login from '../views/login/Login.vue'
 
 const routes = [
   {
@@ -15,6 +16,12 @@ const routes = [
     component: Search,
     name: 'search'
   },
+  {
+    path: "/login",
+    component: Login,
+    name: 'login'
+  },
+
   {
     path: "/manager",
     component: Manager,
