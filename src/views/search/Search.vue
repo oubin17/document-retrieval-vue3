@@ -67,7 +67,7 @@ const router = useRouter()
 const formData = reactive({
   keyword: "",
   pageNo: 1,
-  pageSize: 1
+  pageSize: 10
 })
 formData.keyword = route.query.keyword;
 
