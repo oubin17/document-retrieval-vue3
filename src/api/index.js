@@ -21,6 +21,12 @@ export const fileSearch = (data) => {
 }
 
 //文件删除
-export const fileDelete = (data) => {
-  return request.post('/doc' + data)
+export const fileDelete = (params) => {
+  return request.delete('/doc', {
+    params
+  })
+}
+
+export const fileUpload = (data) => {
+  return request.post("/doc/upload", data)
 }
