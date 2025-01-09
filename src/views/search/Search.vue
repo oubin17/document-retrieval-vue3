@@ -27,7 +27,7 @@
 
         <div class="pagination">
           <el-pagination background :hide-on-single-page="true" :page-size=formData.pageSize layout="prev, pager, next"
-            :page-count=searchResult.count @current-change="handleCurrentChange" />
+            :total=searchResult.count @current-change="handleCurrentChange" />
         </div>
 
       </el-aside>
@@ -206,7 +206,11 @@ onMounted(() => {
   }
 
   .pagination {
-    margin: 0 auto;
+    display: flex;
+    /* 水平居中 */
+    justify-content: center;
+    /* 垂直居中 */
+    align-items: center;
   }
 }
 

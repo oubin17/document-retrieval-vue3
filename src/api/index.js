@@ -20,13 +20,33 @@ export const fileSearch = (data) => {
   return request.post('/doc/search', data)
 }
 
+
+
+//文件上传
+export const fileUpload = (data) => {
+  return request.post("/doc/upload", data)
+}
+
+//目录树
+export const directoryTree = () => {
+  return request.get("/dir/tree")
+}
+
+//文件夹删除
+export const directoryDelete = (params) => {
+  return request.delete("/dir/delete", {
+    params
+  })
+}
+
+//创建文件夹
+export const directoryAdd = (body) => {
+  return request.post("/dir/create", body)
+}
+
 //文件删除
 export const fileDelete = (params) => {
   return request.delete('/doc', {
     params
   })
-}
-
-export const fileUpload = (data) => {
-  return request.post("/doc/upload", data)
 }

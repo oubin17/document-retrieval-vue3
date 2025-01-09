@@ -32,6 +32,11 @@
           </template>
         </el-table-column>
       </el-table>
+
+      <div class="pagination">
+        <el-pagination background :hide-on-single-page="true" :page-size=formData.pageSize layout="prev, pager, next"
+          :total=fileSearchResult.count @current-change="handleCurrentChange" />
+      </div>
     </el-main>
   </el-container>
 
@@ -93,6 +98,11 @@ const handleClick = (item) => {
     }
   })
 
+}
+
+const handleCurrentChange = (val) => {
+  formData.pageNo = val
+  confirm();
 }
 
 //处理文件上传
@@ -200,5 +210,16 @@ const uploadFile = () => {
     font-size: 14px;
     color: #A39E9E;
   }
+}
+
+.pagination {
+  display: flex;
+  /* 水平居中 */
+  justify-content: center;
+  /* 垂直居中 */
+  align-items: center;
+
+  margin-top: 10px;
+
 }
 </style>

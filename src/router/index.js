@@ -4,6 +4,7 @@ import HomePage from '../views/Main.vue'
 import Search from '../views/search/Search.vue'
 import Manager from '../views/manager/Manager.vue'
 import Login from '../views/login/Login.vue'
+import Backend from '../views/backend/Backend.vue'
 
 const routes = [
   {
@@ -26,7 +27,12 @@ const routes = [
     path: "/manager",
     component: Manager,
     name: 'manager'
-  }
+  },
+  {
+    path: "/backend",
+    component: Backend,
+    name: 'backend'
+  },
 ]
 
 const router = createRouter({
