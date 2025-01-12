@@ -60,8 +60,9 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, watch } from 'vue'
+import { ref, reactive, computed, watch, onMounted } from 'vue'
 import { directoryTree, directoryDelete, fileDelete, directoryAdd, fileUpload } from '../api/index'
+import { useSearchStore } from '../stores/searchStores'
 import { ElMessage } from 'element-plus'
 import { defineProps } from 'vue';
 
@@ -77,6 +78,8 @@ const props = defineProps({
   }
 })
 
+const searchStore = useSearchStore();
+
 const dataSource = ref([])
 // 监听 props.message 的变化
 //如果父组件传递的 message 是异步获取的，可能会导致子组件在初始化时 props.message 为空。可以通过 watch 监听 props.message 的变化。
@@ -88,11 +91,22 @@ watch(
   { immediate: true } // 立即执行一次
 );
 
+// 监听 searchStore.dataSource 的变化
+watch(
+  () => searchStore.dataSource,
+  (newValue) => {
+    if (newValue && newValue.length > 0) {
+      dataSource.value = newValue; // 更新 dataSource
+    }
+  }
+);
+
 //删除弹窗的显示隐藏
 const dialogDeleteVisable = ref(false)
 const dialogAppendVisable = ref(false)
 
 const dialogDirectory = reactive({})
+//computed 返回的是一个 只读的响应式引用，不能直接赋值给 ref。
 const isFile = computed(() => {
   return dialogDirectory.directoryType === '2'
 })
@@ -186,6 +200,10 @@ const getTree = async () => {
     console.log(response.data)
   })
 }
+
+onMounted(() => {
+  getTree()
+})
 
 </script>
 

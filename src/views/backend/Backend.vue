@@ -7,10 +7,9 @@
       </div>
     </el-col>
     <el-col class="mid-content" :span="18">
-      <div>
-        233
-      </div>
-      <DirectoryTreeComponent :message="dataSource" />
+
+      <SearchComponent />
+      <DirectoryTreeComponent />
     </el-col>
     <el-col :span="3">
       <div class="grid-content">
@@ -21,22 +20,8 @@
 </template>
 
 <script setup>
-
-import { ref, onMounted } from 'vue'
-import { directoryTree } from '../../api/index'
+import SearchComponent from '../../components/SearchComponent.vue'
 import DirectoryTreeComponent from '../../components/DirectoryTreeComponent.vue'
-
-const dataSource = ref([])
-const getTree = async () => {
-  //发送请求
-  await directoryTree().then((response) => {
-    dataSource.value = response.data.data
-  })
-}
-onMounted(() => {
-  getTree()
-})
-
 </script>
 
 <style lang="less" scoped>

@@ -32,6 +32,11 @@ export const directoryTree = () => {
   return request.get("/dir/tree")
 }
 
+//根据关键字查找
+export const directorySearch = (body) => {
+  return request.post("/dir/search", body)
+}
+
 //文件夹删除
 export const directoryDelete = (params) => {
   return request.delete("/dir/delete", {
