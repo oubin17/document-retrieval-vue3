@@ -1,12 +1,13 @@
 <template>
   <div class="grid-content">
     <el-tree class="dir-tree" :data="dataSource" node-key="id" default-expand-all :expand-on-click-node="false"
-      :props="defaultProps">
+      :props="defaultProps" @node-contextmenu="handleNodeContextMenu">
       <template #default="{ node, data }">
         <span class="custom-tree-node">
           <span class="dir-name">{{ data.directoryName }} </span>
           <span class="dashed-fill"></span>
           <span class="dir-other">
+            <span>{{ formatData(data.createTime) }}</span>
             <input type="file" ref="fileInput" style="display: none" @change="handleFileChange" />
             <a v-if="data.directoryType === '1'" style="margin-left: 8px" @click="upload(node, data)"> 上传</a>
             <a v-if="data.directoryType === '1'" @click="append(data)"> 添加子目录 </a>
@@ -16,6 +17,17 @@
       </template>
     </el-tree>
   </div>
+
+
+  <!-- 右键菜单 -->
+  <div v-if="contextMenu.visible" :style="{
+    position: 'fixed',
+    top: contextMenu.top + 'px',
+    left: contextMenu.left + 'px',
+  }" class="context-menu">
+    <el-button link class="download-button" @click="handleMenuClick()">下载</el-button>
+  </div>
+
 
   <el-dialog v-model="dialogDeleteVisable" title="提醒" width="500" center>
     <div class="dialog">
@@ -63,6 +75,7 @@
 import { ref, reactive, computed, watch, onMounted } from 'vue'
 import { directoryTree, directoryDelete, fileDelete, directoryAdd, fileUpload } from '../api/index'
 import { useSearchStore } from '../stores/searchStores'
+import MomentFormatter from '@/utils/MomentFormatter'; // 引入日期格式化工具类
 import { ElMessage } from 'element-plus'
 import { defineProps } from 'vue';
 
@@ -71,33 +84,34 @@ const defaultProps = {
   children: 'childDirectories',
   label: 'directoryName',
 }
-const props = defineProps({
-  message: {
-    type: Array,
-    default: () => [], // 默认值为空数组
-  }
-})
+// const props = defineProps({
+//   message: {
+//     type: Array,
+//     default: () => [], // 默认值为空数组
+//   }
+// })
 
 const searchStore = useSearchStore();
 
 const dataSource = ref([])
 // 监听 props.message 的变化
 //如果父组件传递的 message 是异步获取的，可能会导致子组件在初始化时 props.message 为空。可以通过 watch 监听 props.message 的变化。
-watch(
-  () => props.message,
-  (newValue) => {
-    dataSource.value = newValue;
-  },
-  { immediate: true } // 立即执行一次
-);
+// watch(
+//   () => props.message,
+//   (newValue) => {
+//     dataSource.value = newValue;
+//   },
+//   { immediate: true } // 立即执行一次
+// );
 
 // 监听 searchStore.dataSource 的变化
 watch(
   () => searchStore.dataSource,
   (newValue) => {
-    if (newValue && newValue.length > 0) {
-      dataSource.value = newValue; // 更新 dataSource
-    }
+    dataSource.value = newValue; // 更新 dataSource
+    // if (newValue && newValue.length > 0) {
+    //   dataSource.value = newValue; // 更新 dataSource
+    // }
   }
 );
 
@@ -169,6 +183,44 @@ const fileCreate = reactive({
   selectedFile: '' // 存储选择的文件
 })
 
+
+// 右键菜单状态
+const contextMenu = reactive({
+  visible: false, // 是否显示菜单
+  top: 0, // 菜单的 top 位置
+  left: 0, // 菜单的 left 位置
+  currentNode: null, // 当前右键点击的节点
+})
+
+//右击
+const handleNodeContextMenu = (event, data, node, component) => {
+  console.log(event)
+  // 阻止默认的右键菜单
+  event.preventDefault();
+
+  // 显示自定义右键菜单
+  contextMenu.visible = true;
+  contextMenu.top = event.clientY;
+  contextMenu.left = event.clientX;
+  contextMenu.currentNode = node;
+
+  // 点击其他地方关闭菜单
+  document.addEventListener('click', closeContextMenu);
+}
+
+/**
+   * 关闭右键菜单
+   */
+const closeContextMenu = () => {
+  contextMenu.visible = false;
+  document.removeEventListener('click', closeContextMenu);
+}
+
+const handleMenuClick = () => {
+  console.log(contextMenu.currentNode.data)
+}
+
+
 //上传文件
 const upload = (node, data) => {
   fileInput.value.click();
@@ -192,6 +244,10 @@ const handleFileChange = (event) => {
     })
   }
 };
+
+const formatData = (date) => {
+  return MomentFormatter.formatDateTime(date)
+}
 
 const getTree = async () => {
   //发送请求
@@ -225,6 +281,20 @@ onMounted(() => {
 
 .dialog {
   text-align: center
+}
+
+.context-menu {
+  background: #fff;
+  border: 1px solid #ddd;
+  // box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+  padding: 2px;
+  z-index: 1000;
+
+  .download-button {
+    font-size: 13px;
+    font-weight: 100px;
+    color: rgba(0, 136, 255, 1);
+  }
 }
 
 .custom-tree-node {
@@ -263,7 +333,8 @@ onMounted(() => {
   .dir-other {
     font-size: 13px;
 
-    a {
+    a,
+    span {
       color: #8a8f8d
     }
   }

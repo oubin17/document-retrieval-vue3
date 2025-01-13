@@ -1,17 +1,17 @@
 <template>
   <el-row :gutter="20">
 
-    <el-col :span="3">
+    <el-col :span="4">
       <div class="grid-content">
         1
       </div>
     </el-col>
-    <el-col class="mid-content" :span="18">
+    <el-col class="mid-content" :span="16">
 
       <SearchComponent />
       <DirectoryTreeComponent />
     </el-col>
-    <el-col :span="3">
+    <el-col :span="4">
       <div class="grid-content">
         3
       </div>
@@ -31,7 +31,7 @@ import DirectoryTreeComponent from '../../components/DirectoryTreeComponent.vue'
 
 .mid-content {
   border-radius: 4px;
-  background-color: #f5f5f5;
+  background-color: rgba(250, 250, 250);
   border: 1px solid #ccc;
   /* 可选：添加边框以便查看容器范围 */
 }
