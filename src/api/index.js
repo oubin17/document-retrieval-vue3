@@ -27,6 +27,15 @@ export const fileUpload = (data) => {
   return request.post("/doc/upload", data)
 }
 
+//文件下载
+export const fileDownload = (params) => {
+  return request.get("/doc/download", {
+    params,
+    responseType: 'blob', // 这里很重要：指定响应类型为二进制数据
+  })
+}
+
+
 //目录树
 export const directoryTree = () => {
   return request.get("/dir/tree")

@@ -9,7 +9,7 @@
           <span class="dir-other">
             <span>{{ formatData(data.createTime) }}</span>
             <input type="file" ref="fileInput" style="display: none" @change="handleFileChange" />
-            <a v-if="data.directoryType === '1'" style="margin-left: 8px" @click="upload(node, data)"> 上传</a>
+            <a v-if="data.directoryType === '1'" style="margin-left: 8px" @click="upload(node, data)">上传</a>
             <a v-if="data.directoryType === '1'" @click="append(data)"> 添加子目录 </a>
             <a style="margin-left: 8px; color: #E35F5F;" @click="remove(node, data)"> 删除 </a>
           </span>
@@ -73,7 +73,7 @@
 
 <script setup>
 import { ref, reactive, computed, watch, onMounted } from 'vue'
-import { directoryTree, directoryDelete, fileDelete, directoryAdd, fileUpload } from '../api/index'
+import { directoryTree, directoryDelete, fileDelete, directoryAdd, fileUpload, fileDownload } from '../api/index'
 import { useSearchStore } from '../stores/searchStores'
 import MomentFormatter from '@/utils/MomentFormatter'; // 引入日期格式化工具类
 import { ElMessage } from 'element-plus'
@@ -194,16 +194,18 @@ const contextMenu = reactive({
 
 //右击
 const handleNodeContextMenu = (event, data, node, component) => {
-  console.log(event)
+  console.log(data)
   // 阻止默认的右键菜单
   event.preventDefault();
 
   // 显示自定义右键菜单
-  contextMenu.visible = true;
-  contextMenu.top = event.clientY;
-  contextMenu.left = event.clientX;
-  contextMenu.currentNode = node;
-
+  if (data.directoryType == '2') {
+    //文件
+    contextMenu.visible = true;
+    contextMenu.top = event.clientY;
+    contextMenu.left = event.clientX;
+    contextMenu.currentNode = node;
+  }
   // 点击其他地方关闭菜单
   document.addEventListener('click', closeContextMenu);
 }
@@ -217,7 +219,31 @@ const closeContextMenu = () => {
 }
 
 const handleMenuClick = () => {
-  console.log(contextMenu.currentNode.data)
+  const params = { "fileId": contextMenu.currentNode.data.fileId }
+  fileDownload(params).then((response) => {
+
+    console.log(response.data)
+    // 创建一个 Blob 对象
+    const blob = new Blob([response.data], { type: response.headers['content-type'] });
+
+    // 创建一个链接元素
+    const link = document.createElement('a');
+    link.href = window.URL.createObjectURL(blob);
+
+    // 设置下载的文件名
+
+    const fileName = response.headers['content-disposition']
+      .split('filename*=UTF-8')[1]
+      .replace(/['"]/g, ''); // 从响应头中提取文件名
+    // const fileName = 'a.docx';
+    link.download = decodeURIComponent(fileName);
+
+    // 触发下载
+    link.click();
+
+    // 释放对象 URL
+    window.URL.revokeObjectURL(link.href);
+  })
 }
 
 
