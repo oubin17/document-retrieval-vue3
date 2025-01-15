@@ -64,3 +64,9 @@ export const fileDelete = (params) => {
     params
   })
 }
+
+
+//目录树
+export const orgTree = () => {
+  return request.get("/org/current")
+}

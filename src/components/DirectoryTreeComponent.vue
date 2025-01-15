@@ -73,7 +73,7 @@
 
 <script setup>
 import { ref, reactive, computed, watch, onMounted } from 'vue'
-import { directoryTree, directoryDelete, fileDelete, directoryAdd, fileUpload, fileDownload } from '../api/index'
+import { directoryTree, directoryDelete, fileDelete, directoryAdd, fileUpload, fileDownload } from '@/api/index'
 import { useSearchStore } from '../stores/searchStores'
 import MomentFormatter from '@/utils/MomentFormatter'; // 引入日期格式化工具类
 import { ElMessage } from 'element-plus'
@@ -302,6 +302,8 @@ onMounted(() => {
   .dir-tree {
     width: 1000px;
     max-width: 100%;
+    //优化：屏幕高度
+    min-height: 1000px;
   }
 }
 
