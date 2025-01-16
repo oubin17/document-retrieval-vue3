@@ -5,11 +5,21 @@ import { ref, reactive } from 'vue';
 // 第一个参数是应用程序中 store 的唯一 id
 export const useSearchStore = defineStore('searchResult', {
   state: () => ({
+    orgId: '',
+    keyword: '',
+    searchType: '1',
     dataSource: ref([]), // 使用 ref 管理数组
   }),
   actions: {
-    initMethod (payload) {
+    initDataSource (payload) {
       this.dataSource = payload
+    },
+    initOrgId (payload) {
+      this.orgId = payload
+    },
+    initSearchCondition (keyword, searchType) {
+      this.keyword = keyword
+      this.searchType = searchType
     }
   },
 

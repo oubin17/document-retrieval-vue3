@@ -283,9 +283,9 @@ const getTree = async () => {
   })
 }
 
-onMounted(() => {
-  getTree()
-})
+// onMounted(() => {
+//   getTree()
+// })
 
 </script>
 

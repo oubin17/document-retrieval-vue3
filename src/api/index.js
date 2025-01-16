@@ -15,6 +15,11 @@ export const userLogin = (data) => {
   return request.post('/user/login', data)
 }
 
+//用户权限
+export const userPermission = () => {
+  return request.get('/permission/info')
+}
+
 //根据文件名称查找
 export const fileSearch = (data) => {
   return request.post('/doc/search', data)

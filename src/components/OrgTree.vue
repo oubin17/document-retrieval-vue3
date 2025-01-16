@@ -27,7 +27,10 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
-import { orgTree } from '@/api/index'
+import { orgTree, directorySearch } from '@/api/index'
+import { useSearchStore } from '../stores/searchStores'
+
+const searchStore = useSearchStore();
 
 const userInfo = JSON.parse(localStorage.getItem('userInfo'))
 
@@ -37,10 +40,19 @@ const defaultProps = {
   label: 'orgName',
 }
 
+const formData = reactive({
+  orgId: "",
+  keyword: "",
+  searchType: '1',
+})
+
 const handleNodeClick = (data) => {
 
   if (data.childOrganizations.length === 0) {
-    console.log(data)
+    formData.orgId = data.id
+    formData.searchType = searchStore.searchType
+    formData.keyword = searchStore.keyword
+    getTree()
   }
 
 
@@ -56,10 +68,19 @@ const handleCommand = (command) => {
   }
 }
 
-onMounted(() => {
-  orgTree().then((response) => {
+const getTree = async () => {
+  await directorySearch(formData).then((response) => {
+    searchStore.initDataSource(response.data.data)
+  })
+}
+
+onMounted(async () => {
+  await orgTree().then((response) => {
     orgTreeList.value = []
     orgTreeList.value.push(response.data.data)
+    searchStore.initOrgId(response.data.data.childOrganizations[0].id)
+    formData.orgId = response.data.data.childOrganizations[0].id
+    getTree()
   })
 })
 

@@ -31,10 +31,14 @@
 <script setup>
 import { reactive } from 'vue'
 
-import { userLogin } from '../../api'
+import { userLogin, userPermission } from '@/api'
 //需要引入字体图标库，否则不展示
 import { Lock } from '@element-plus/icons-vue';
 import { useRouter } from 'vue-router';
+
+import { useSearchStore } from '@/stores/searchStores'
+
+const searchStore = useSearchStore();
 
 // do not use same name with ref
 const form = reactive({
@@ -52,12 +56,24 @@ const onSubmit = () => {
   //登录页面
   userLogin(form).then(({ data }) => {
     if (data.success === true) {
-      ElMessage.success('登录成功')
       //保存token和用户信息
       localStorage.setItem('odk-token', data.data.token)
       //这里需要序列化，转成字符串
       localStorage.setItem('userInfo', JSON.stringify(data.data))
-      router.push('/manager')
+
+      //取出组织，缓存起来
+      // searchStore.initOrgId(data.data.organizationTree.childOrganizations[0].id)
+
+      userPermission().then((response) => {
+
+        const isAdmin = response.data.data.roles.find(item => item.roleCode === 'ADMIN')
+        if (isAdmin) {
+          router.push('/backend')
+        } else {
+          router.push('/')
+        }
+        ElMessage.success('登录成功')
+      })
     } else {
       console.log('error submit!', fields)
     }

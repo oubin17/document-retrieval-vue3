@@ -32,6 +32,7 @@ const searchStore = useSearchStore();
 const formRef = ref()
 const formData = reactive({
   keyword: "",
+  orgId: "",
   pageNo: 1,
   pageSize: 10,
   searchType: '1',
@@ -50,9 +51,17 @@ const confirm = async () => {
   //   return;
   // }
   //发送请求
+  if (formData.orgId.trim().length < 1) {
+    //初始化，从登录session中获取
+    const userInfo = JSON.parse(localStorage.getItem("userInfo"))
+    formData.orgId = userInfo.organizationTree.childOrganizations[0].id
+  } else {
+    //从pinia中获取
+    formData.orgId = searchStore.orgId
+  }
+  searchStore.initSearchCondition(formData.keyword, formData.searchType)
   await directorySearch(formData).then((response) => {
-    searchStore.initMethod(response.data.data)
-    console.log(searchStore.dataSource)
+    searchStore.initDataSource(response.data.data)
   })
 }
 </script>
