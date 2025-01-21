@@ -27,10 +27,12 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { orgTree, directorySearch } from '@/api/index'
 import { useSearchStore } from '../stores/searchStores'
 
 const searchStore = useSearchStore();
+const router = useRouter()
 
 const userInfo = JSON.parse(localStorage.getItem('userInfo'))
 
@@ -52,10 +54,9 @@ const handleNodeClick = (data) => {
     formData.orgId = data.id
     formData.searchType = searchStore.searchType
     formData.keyword = searchStore.keyword
+    searchStore.initOrgId(data.id)
     getTree()
   }
-
-
 }
 
 const handleCommand = (command) => {
@@ -63,8 +64,9 @@ const handleCommand = (command) => {
   if (command === 'cancel') {
     localStorage.removeItem('odk-token')
     localStorage.removeItem('userInfo')
+    router.push('/login')
 
-    window.location.href = window.location.origin
+    // window.location.href = window.location.origin
   }
 }
 
@@ -74,8 +76,8 @@ const getTree = async () => {
   })
 }
 
-onMounted(async () => {
-  await orgTree().then((response) => {
+onMounted(() => {
+  orgTree().then((response) => {
     orgTreeList.value = []
     orgTreeList.value.push(response.data.data)
     searchStore.initOrgId(response.data.data.childOrganizations[0].id)

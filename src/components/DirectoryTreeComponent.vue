@@ -1,4 +1,9 @@
 <template>
+  <div class="dir-add">
+    <el-button type="primary" @click="append()">添加目录</el-button>
+  </div>
+
+
   <div class="grid-content">
     <el-tree class="dir-tree" :data="dataSource" node-key="id" default-expand-all :expand-on-click-node="false"
       :props="defaultProps" @node-contextmenu="handleNodeContextMenu">
@@ -143,23 +148,29 @@ const isFile = computed(() => {
 
 const directoryCreate = reactive({
   directoryName: '',
-  parentId: ''
+  parentId: '',
+  orgId: ''
 })
 
 //添加按钮
 const append = (data) => {
-  directoryCreate.parentId = data.id
+  if (data) {
+    directoryCreate.parentId = data.id
+  }
   dialogAppendVisable.value = true
 }
 
 //确认添加
 const confirmAppend = (() => {
+  directoryCreate.orgId = searchStore.orgId
+
   directoryAdd(directoryCreate).then((response) => {
     if (response.data.success) {
       ElMessage.success('添加成功')
     } else {
       ElMessage.error('添加失败')
     }
+    directoryCreate.parentId = ''
     directoryCreate.directoryName = null
     dialogAppendVisable.value = false
     getTree()
@@ -336,6 +347,7 @@ const handleFileChange = (event) => {
     const formData = new FormData()
     formData.append("file", fileCreate.selectedFile)
     formData.append("dirId", fileCreate.id)
+    formData.append("orgId", searchStore.orgId)
     fileUpload(formData).then((response) => {
       if (response.data.data) {
         //上传成功
@@ -354,15 +366,19 @@ const formatData = (date) => {
 
 const getTree = async () => {
   //发送请求
-  await directoryTree().then((response) => {
+  const params = { "orgId": searchStore.orgId }
+  await directoryTree(params).then((response) => {
     dataSource.value = response.data.data
-    console.log(response.data)
   })
 }
 
 </script>
 
 <style lang="less" scoped>
+.dir-add {
+  padding: 0 0 10px 10%;
+}
+
 .grid-content {
   display: flex;
   /* 启用 Flexbox 布局 */
@@ -441,15 +457,6 @@ const getTree = async () => {
   }
 
 }
-
-// #docxPreview,
-// #pdfPreview,
-// #docPreview {
-//   margin-top: 20px;
-//   width: 100%;
-//   height: 500px;
-//   border: 1px solid #ccc;
-// }
 
 /* PDF/DOC 预览 */
 .preview-iframe {

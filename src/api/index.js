@@ -40,10 +40,11 @@ export const fileDownload = (params) => {
   })
 }
 
-
 //目录树
-export const directoryTree = () => {
-  return request.get("/dir/tree")
+export const directoryTree = (params) => {
+  return request.get("/dir/tree", {
+    params,
+  })
 }
 
 //根据关键字查找

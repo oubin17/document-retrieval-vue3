@@ -3,7 +3,6 @@
 
     <el-col class="grid-content" :span="4">
       <div>
-        123
       </div>
     </el-col>
     <el-col class="mid-content" :span="16">
