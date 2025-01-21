@@ -25,9 +25,24 @@
     top: contextMenu.top + 'px',
     left: contextMenu.left + 'px',
   }" class="context-menu">
+    <el-button link class="download-button" @click="handlePreview()">预览</el-button>
     <el-button link class="download-button" @click="handleMenuClick()">下载</el-button>
   </div>
 
+  <!-- Element Plus 预览弹窗 -->
+  <el-dialog v-model="isModalVisible" :title="`文件预览 - ${fileName}`" width="80%" :before-close="closeModal">
+
+    <!-- PDF 预览 -->
+    <iframe v-if="fileType === 'pdf'" :src="fileUrl" class="preview-iframe"></iframe>
+
+    <!-- DOCX 预览 -->
+    <div v-if="fileType === 'docx'" ref="docxPreview" class="preview-docx"></div>
+
+    <!-- DOC 预览 -->
+    <!-- <iframe v-if="fileType === 'doc'"
+      :src="`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(fileUrl)}`"
+      class="preview-iframe"></iframe> -->
+  </el-dialog>
 
   <el-dialog v-model="dialogDeleteVisable" title="提醒" width="500" center>
     <div class="dialog">
@@ -72,12 +87,13 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, watch, onMounted } from 'vue'
+import { ref, reactive, computed, watch, nextTick } from 'vue'
 import { directoryTree, directoryDelete, fileDelete, directoryAdd, fileUpload, fileDownload } from '@/api/index'
 import { useSearchStore } from '../stores/searchStores'
 import MomentFormatter from '@/utils/MomentFormatter'; // 引入日期格式化工具类
 import { ElMessage } from 'element-plus'
 import { defineProps } from 'vue';
+import * as docx from 'docx-preview';
 
 const defaultProps = {
   id: 'id',
@@ -218,6 +234,67 @@ const closeContextMenu = () => {
   document.removeEventListener('click', closeContextMenu);
 }
 
+
+//预览弹窗
+const isModalVisible = ref(false)
+const fileUrl = ref(''); // 文件 URL
+const fileType = ref(''); // 文件类型
+const fileName = ref(''); //文件名称
+const docxPreview = ref(null); // DOCX 预览容器
+
+//文件预览
+const handlePreview = async () => {
+  const params = { "fileId": contextMenu.currentNode.data.fileId }
+  const resp = await fileDownload(params)
+  if (!resp || !resp.data) {
+    throw new Error('文件下载失败')
+  }
+  const blob = new Blob([resp.data], { type: resp.headers['content-type'] });
+  // 将文件内容转换为 Blob 对象
+  fileUrl.value = URL.createObjectURL(blob);
+  fileName.value = contextMenu.currentNode.data.directoryName
+
+
+  if (fileName.value.includes('.pdf')) {
+    fileType.value = 'pdf'
+  } else if (fileName.value.includes('.docx')) {
+    fileType.value = 'docx'
+  }
+  // else if (fileName.incluese('.doc')) {
+  //   fileType.value = 'doc'
+  // }
+  else {
+    throw new Error('不支持的文件类型');
+  }
+  isModalVisible.value = true
+  // 等待弹窗完全打开
+  await nextTick();
+
+  if (fileType.value === 'docx') {
+    docx.renderAsync(blob, docxPreview.value)
+      .then(() => console.log('DOCX 渲染完成'))
+      .catch((err) => {
+        console.error('DOCX 渲染失败:', err);
+        ElMessage.error('DOCX 文件渲染失败');
+      });
+  } else if (fileType.value === 'pdf') {
+
+  } else if (fileType.value === 'doc') {
+
+  } else {
+
+  }
+
+}
+
+// 关闭弹窗
+const closeModal = () => {
+  isModalVisible.value = false;
+  fileUrl.value = ''; // 清空文件 URL
+  fileType.value = ''; // 清空文件类型
+};
+
+//文件下载
 const handleMenuClick = () => {
   const params = { "fileId": contextMenu.currentNode.data.fileId }
   fileDownload(params).then((response) => {
@@ -282,10 +359,6 @@ const getTree = async () => {
     console.log(response.data)
   })
 }
-
-// onMounted(() => {
-//   getTree()
-// })
 
 </script>
 
@@ -367,5 +440,28 @@ const getTree = async () => {
     }
   }
 
+}
+
+// #docxPreview,
+// #pdfPreview,
+// #docPreview {
+//   margin-top: 20px;
+//   width: 100%;
+//   height: 500px;
+//   border: 1px solid #ccc;
+// }
+
+/* PDF/DOC 预览 */
+.preview-iframe {
+  width: 100%;
+  height: 70vh;
+  border: none;
+}
+
+/* DOCX 预览 */
+.preview-docx {
+  width: 100%;
+  height: 70vh;
+  overflow: auto;
 }
 </style>
