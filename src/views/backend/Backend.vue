@@ -33,23 +33,23 @@ watch(
   () => route.path,
   (newPath, oldPath) => {
     if (oldPath !== newPath) {
+      if (!route.query.searchType) {
+        searchStore.searchType = '1'
+      } else {
+        searchStore.searchType = route.query.searchType
+      }
       searchStore.keyword = route.query.keyword
-      searchStore.searchType = route.query.searchType
+
 
       const formData = {
         keyword: searchStore.keyword,
         searchType: searchStore.searchType,
-        orgId: searchStore.orgId
       }
-      //发送请求
-      if (formData.orgId.trim().length < 1) {
-        //初始化，从登录session中获取
-        const userInfo = JSON.parse(localStorage.getItem("userInfo"))
-        formData.orgId = userInfo.organizationTree.childOrganizations[0].id
-      }
-
+      //初始化，从登录session中获取
+      const userInfo = JSON.parse(localStorage.getItem("userInfo"))
+      formData.orgId = userInfo.organizationTree.childOrganizations[0].id
       directorySearch(formData).then((response) => {
-        searchStore.initDataSource(response.data.data)
+        searchStore.dataSource = response.data.data
       })
     }
 

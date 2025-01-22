@@ -1,5 +1,5 @@
 <template>
-  <div class="dir-add">
+  <div v-if="isAdmin" class="dir-add">
     <el-button type="primary" @click="append()">添加目录</el-button>
   </div>
 
@@ -14,9 +14,9 @@
           <span class="dir-other">
             <span>{{ formatData(data.createTime) }}</span>
             <input type="file" ref="fileInput" style="display: none" @change="handleFileChange" />
-            <a v-if="data.directoryType === '1'" style="margin-left: 8px" @click="upload(node, data)">上传</a>
-            <a v-if="data.directoryType === '1'" @click="append(data)"> 添加子目录 </a>
-            <a style="margin-left: 8px; color: #E35F5F;" @click="remove(node, data)"> 删除 </a>
+            <a v-if="data.directoryType === '1' && isAdmin" style="margin-left: 8px" @click="upload(node, data)">上传</a>
+            <a v-if="data.directoryType === '1' && isAdmin" @click="append(data)"> 添加子目录 </a>
+            <a v-if="isAdmin" style="margin-left: 8px; color: #E35F5F;" @click="remove(node, data)"> 删除 </a>
           </span>
         </span>
       </template>
@@ -97,7 +97,6 @@ import { directoryTree, directoryDelete, fileDelete, directoryAdd, fileUpload, f
 import { useSearchStore } from '../stores/searchStores'
 import MomentFormatter from '@/utils/MomentFormatter'; // 引入日期格式化工具类
 import { ElMessage } from 'element-plus'
-import { defineProps } from 'vue';
 import * as docx from 'docx-preview';
 
 const defaultProps = {
@@ -105,36 +104,30 @@ const defaultProps = {
   children: 'childDirectories',
   label: 'directoryName',
 }
-// const props = defineProps({
-//   message: {
-//     type: Array,
-//     default: () => [], // 默认值为空数组
-//   }
-// })
 
 const searchStore = useSearchStore();
 
 const dataSource = ref([])
-// 监听 props.message 的变化
-//如果父组件传递的 message 是异步获取的，可能会导致子组件在初始化时 props.message 为空。可以通过 watch 监听 props.message 的变化。
-// watch(
-//   () => props.message,
-//   (newValue) => {
-//     dataSource.value = newValue;
-//   },
-//   { immediate: true } // 立即执行一次
-// );
 
 // 监听 searchStore.dataSource 的变化
 watch(
   () => searchStore.dataSource,
   (newValue) => {
     dataSource.value = newValue; // 更新 dataSource
-    // if (newValue && newValue.length > 0) {
-    //   dataSource.value = newValue; // 更新 dataSource
-    // }
   }
 );
+
+//判断是不是管理员，是的话，展示上传，删除按钮
+const isAdmin = computed(() => {
+  const userInfo = JSON.parse(localStorage.getItem("userInfo"))
+  try {
+    return userInfo.roles.some(item => item.roleCode === 'ADMIN')
+  } catch (error) {
+    console.log('解析用户信息出错：', error)
+    return false
+  }
+
+})
 
 //删除弹窗的显示隐藏
 const dialogDeleteVisable = ref(false)

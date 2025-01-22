@@ -59,12 +59,11 @@ const onSubmit = () => {
       //保存token和用户信息
       localStorage.setItem('odk-token', data.data.token)
       //这里需要序列化，转成字符串
-      localStorage.setItem('userInfo', JSON.stringify(data.data))
-
-      //取出组织，缓存起来
-      // searchStore.initOrgId(data.data.organizationTree.childOrganizations[0].id)
+      const userInfo = data.data
 
       userPermission().then((response) => {
+        userInfo.roles = response.data.data.roles
+        localStorage.setItem('userInfo', JSON.stringify(data.data))
 
         const isAdmin = response.data.data.roles.find(item => item.roleCode === 'ADMIN')
         if (isAdmin) {
