@@ -21,23 +21,26 @@
 
 <script setup>
 
-import { ref, reactive } from 'vue'
+import { ref, reactive, watch } from 'vue'
 import { directoryTree, directorySearch } from '../api/index'
 import { search } from '../api'
 import { useSearchStore } from '../stores/searchStores'
+import { useRoute, useRouter } from 'vue-router'
 
+const route = useRoute()
+const router = useRouter()
 
 const searchStore = useSearchStore();
-
 const formRef = ref()
 const formData = reactive({
   keyword: "",
   orgId: "",
-  pageNo: 1,
-  pageSize: 10,
   searchType: '1',
 })
 
+const props = defineProps(['keyword', 'searchType'])
+formData.keyword = props.keyword
+formData.searchType = props.searchType
 
 const searchResult = reactive({
   count: 0,
@@ -45,11 +48,7 @@ const searchResult = reactive({
 })
 //表单提交
 const confirm = async () => {
-  //手动触发表单校验
-  // if (formData.keyword === '') {
-  //   ElMessage.error('请输入查找关键字')
-  //   return;
-  // }
+
   //发送请求
   if (formData.orgId.trim().length < 1) {
     //初始化，从登录session中获取
@@ -59,11 +58,23 @@ const confirm = async () => {
     //从pinia中获取
     formData.orgId = searchStore.orgId
   }
-  searchStore.initSearchCondition(formData.keyword, formData.searchType)
-  await directorySearch(formData).then((response) => {
-    searchStore.initDataSource(response.data.data)
-  })
+  //如果是首页点击的搜索，直接跳到搜索页
+  if (route.fullPath === '/') {
+    router.push({
+      path: '/backend',
+      query: {
+        keyword: formData.keyword,
+        searchType: formData.searchType
+      }
+    })
+  } else {
+    //否则，直接搜索
+    await directorySearch(formData).then((response) => {
+      searchStore.dataSource = response.data.data
+    })
+  }
 }
+
 </script>
 
 <style lang="less" scoped>
@@ -93,11 +104,6 @@ const confirm = async () => {
   margin-top: 31px;
   width: 758px;
   height: 58px;
-  // opacity: 1;
-  // border: 1px solid rgba(0, 136, 255, 1);
-  // border-radius: 10px;
-  // background: rgba(255, 255, 255, 1);
-
 
   .search {
     flex: 1;
@@ -109,14 +115,6 @@ const confirm = async () => {
     // font-weight: 400;
     // border-radius: 0 10px 10px 0;
   }
-
-  // .search :deep(.el-input--suffix) {
-  //   border-top-right-radius: 0;
-  //   /* 移除输入框右侧圆角 */
-  //   border-bottom-right-radius: 0;
-  //   border-right: none;
-  //   /* 移除输入框右侧边框 */
-  // }
 
   .submit {
     border-top-left-radius: 0;

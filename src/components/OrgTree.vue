@@ -54,7 +54,7 @@ const handleNodeClick = (data) => {
     formData.orgId = data.id
     formData.searchType = searchStore.searchType
     formData.keyword = searchStore.keyword
-    searchStore.initOrgId(data.id)
+    searchStore.orgId = data.id
     getTree()
   }
 }
@@ -72,7 +72,7 @@ const handleCommand = (command) => {
 
 const getTree = async () => {
   await directorySearch(formData).then((response) => {
-    searchStore.initDataSource(response.data.data)
+    searchStore.dataSource = response.data.data
   })
 }
 
@@ -80,9 +80,8 @@ onMounted(() => {
   orgTree().then((response) => {
     orgTreeList.value = []
     orgTreeList.value.push(response.data.data)
-    searchStore.initOrgId(response.data.data.childOrganizations[0].id)
+    searchStore.orgId = response.data.data.childOrganizations[0].id
     formData.orgId = response.data.data.childOrganizations[0].id
-    getTree()
   })
 })
 

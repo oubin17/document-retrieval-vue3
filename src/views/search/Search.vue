@@ -1,4 +1,9 @@
 <template>
+
+  <SearchComponent />
+
+
+  <!--   
   <el-container>
     <el-header class="search-header">
       <el-text class="text-title">搜索一下</el-text>
@@ -49,7 +54,7 @@
         </el-main>
       </el-main>
     </el-container>
-  </el-container>
+  </el-container> -->
 
 
 </template>
@@ -59,6 +64,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { search, commonSearch } from '../../api'
 import { useSearchStore } from '../../stores/searchStores'
 import { ref, reactive, onMounted } from 'vue'
+import SearchComponent from '@/components/SearchComponent.vue'
 
 const searchStore = useSearchStore();
 const route = useRoute()

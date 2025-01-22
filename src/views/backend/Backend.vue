@@ -6,7 +6,7 @@
       </div>
     </el-col>
     <el-col class="mid-content" :span="16">
-      <SearchComponent />
+      <SearchComponent :keyword="searchStore.keyword" :searchType="searchStore.searchType" />
       <DirectoryTreeComponent />
     </el-col>
     <el-col class="grid-content" :span="4">
@@ -19,6 +19,48 @@
 import SearchComponent from '@/components/SearchComponent.vue'
 import DirectoryTreeComponent from '@/components/DirectoryTreeComponent.vue'
 import OrgTree from '@/components/OrgTree.vue'
+import { useSearchStore } from '@/stores/searchStores'
+import { watch } from 'vue'
+import { useRoute } from 'vue-router'
+import { directorySearch } from '@/api/index'
+
+const route = useRoute()
+
+const searchStore = useSearchStore();
+
+// 监听路径变化
+watch(
+  () => route.path,
+  (newPath, oldPath) => {
+    if (oldPath !== newPath) {
+      searchStore.keyword = route.query.keyword
+      searchStore.searchType = route.query.searchType
+
+      const formData = {
+        keyword: searchStore.keyword,
+        searchType: searchStore.searchType,
+        orgId: searchStore.orgId
+      }
+      //发送请求
+      if (formData.orgId.trim().length < 1) {
+        //初始化，从登录session中获取
+        const userInfo = JSON.parse(localStorage.getItem("userInfo"))
+        formData.orgId = userInfo.organizationTree.childOrganizations[0].id
+      }
+
+      directorySearch(formData).then((response) => {
+        searchStore.initDataSource(response.data.data)
+      })
+    }
+
+  },
+  //初始化时执行逻辑：如果你希望在组件初始化时立即执行某些逻辑，而不是等待数据变化。
+  //监听路由或查询参数：在监听路由或查询参数时，通常希望在组件加载时立即获取初始值，而不是等待路由变化。 立即执行一次，这个很重要
+  { immediate: true }
+
+);
+
+
 </script>
 
 <style lang="less" scoped>
