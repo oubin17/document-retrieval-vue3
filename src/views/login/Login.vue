@@ -1,31 +1,28 @@
 <template>
+  <el-row class="login-container" justify="center" :align="'middle'">
+    <el-card class="login-card">
+      <div class="login-header">
+        <h2>系统登录</h2>
+        <p class="welcome-text">欢迎回来，请登录您的账号</p>
+      </div>
 
-  <el-row class="login-container " justify="center" :align="'middle'">
-    <el-card style="max-width: 480px">
-      <!-- <template #header>
-        <div class="card-header">
-          <img :src="imgUrl" alt="" />
-        </div>
-      </template> -->
-
-      <el-form :model="form" label-width="auto" style="max-width: 600px">
-        <el-form-item label="账号">
-          <el-input v-model="form.loginId" />
-        </el-form-item>
-
-        <el-form-item label="密码" prop="password">
-          <el-input v-model="form.identifyValue" type="password" placeholder="密码" :prefix-icon="Lock"></el-input>
-        </el-form-item>
+      <el-form :model="form" label-width="0" class="login-form">
         <el-form-item>
-          <el-button type="primary" @click="onSubmit">登录</el-button>
-          <el-button @click="cancel">重置</el-button>
+          <el-input v-model="form.loginId" placeholder="请输入账号" :prefix-icon="User" size="large" />
+        </el-form-item>
+
+        <el-form-item>
+          <el-input v-model="form.identifyValue" type="password" placeholder="请输入密码" :prefix-icon="Lock" size="large"
+            show-password />
+        </el-form-item>
+
+        <el-form-item class="login-buttons">
+          <el-button type="primary" @click="onSubmit" size="large" class="submit-btn">登录</el-button>
+          <el-button @click="cancel" size="large" class="reset-btn">重置</el-button>
         </el-form-item>
       </el-form>
-
     </el-card>
   </el-row>
-
-
 </template>
 
 <script setup>
@@ -33,7 +30,7 @@ import { reactive } from 'vue'
 
 import { userLogin, userPermission } from '@/api'
 //需要引入字体图标库，否则不展示
-import { Lock } from '@element-plus/icons-vue';
+import { Lock, User } from '@element-plus/icons-vue';
 import { useRouter } from 'vue-router';
 
 import { useSearchStore } from '@/stores/searchStores'
@@ -85,25 +82,69 @@ const cancel = () => {
 </script>
 
 <style lang="less" scoped>
-:deep(.el-card__header) {
-  padding: 0;
-}
-
 .login-container {
-  height: 100%;
+  height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 
-  .card-header {
-    background-color: #899fe1;
+  .login-card {
+    width: 400px;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 
-    img {
-      width: 480px;
-      height: 200px;
+    .login-header {
+      text-align: center;
+      margin-bottom: 30px;
+
+      h2 {
+        font-size: 24px;
+        color: #303133;
+        margin-bottom: 10px;
+      }
+
+      .welcome-text {
+        color: #909399;
+        font-size: 14px;
+      }
     }
-  }
 
-  .jump-link {
-    text-align: right;
-    margin-bottom: 10px;
+    .login-form {
+      padding: 0 20px;
+
+      //改组件内部的样式
+      :deep(.el-input) {
+        .el-input__wrapper {
+          border-radius: 8px;
+          height: 45px;
+        }
+      }
+
+      .login-buttons {
+        margin-top: 30px;
+        display: flex; // 添加 flex 布局
+        justify-content: space-between; // 两个按钮之间自动分配空间
+        // gap: 20px; // 使用 gap 设置按钮之间的间距
+        // padding: 0; // 移除内边距
+        // margin-bottom: 0; // 移除底部外边距
+
+        .submit-btn,
+        .reset-btn {
+          flex: 1;
+          width: 45%;
+          height: 45px;
+          border-radius: 8px;
+          font-size: 16px;
+        }
+
+        .submit-btn {
+          background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+          border: none;
+
+          &:hover {
+            opacity: 0.9;
+          }
+        }
+      }
+    }
   }
 }
 </style>
