@@ -54,7 +54,7 @@ const onSubmit = () => {
   userLogin(form).then(({ data }) => {
     if (data.success === true) {
       //保存token和用户信息
-      localStorage.setItem('odk-token', data.data.token)
+      localStorage.setItem('document-retrieval-token', data.data.token)
       //这里需要序列化，转成字符串
       const userInfo = data.data
 

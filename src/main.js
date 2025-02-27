@@ -16,7 +16,7 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 
 //路由守卫，如果没有token，不允许进入
 router.beforeEach((to, from) => {
-  const odkToken = localStorage.getItem('odk-token')
+  const odkToken = localStorage.getItem('document-retrieval-token')
   //非登录，注册页面token不存在
   if (!odkToken && to.path == '/manager') {
     return '/login'

@@ -62,7 +62,7 @@ const handleNodeClick = (data) => {
 const handleCommand = (command) => {
 
   if (command === 'cancel') {
-    localStorage.removeItem('odk-token')
+    localStorage.removeItem('document-retrieval-token')
     localStorage.removeItem('userInfo')
     router.push('/login')
 
