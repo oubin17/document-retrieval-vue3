@@ -35,6 +35,8 @@ import { useRouter } from 'vue-router';
 
 import { useSearchStore } from '@/stores/searchStores'
 
+import { encrypt } from '@/utils/crypto'
+
 const searchStore = useSearchStore();
 
 // do not use same name with ref
@@ -50,8 +52,14 @@ const imgUrl = new URL('../../../public/login-head.png', import.meta.url).href
 const router = useRouter()
 const onSubmit = () => {
 
+  const encryptedForm = {
+    ...form,
+    identifyValue: encrypt(form.identifyValue)
+  }
+  console.log(encryptedForm, "form")
+
   //登录页面
-  userLogin(form).then(({ data }) => {
+  userLogin(encryptedForm).then(({ data }) => {
     if (data.success === true) {
       //保存token和用户信息
       localStorage.setItem('document-retrieval-token', data.data.token)

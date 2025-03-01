@@ -39,6 +39,6 @@ const router = createRouter({
   //路由数据
   routes,
   //路由匹配模式
-  history: createWebHashHistory()
+  history: createWebHashHistory('/' + import.meta.env.VITE_APP_NAME + '/')
 })
 export default router
